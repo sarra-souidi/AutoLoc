@@ -28,4 +28,9 @@ public class Maintenance {
 
     @Column(length = 255)
     private String description;
+
+    // N Maintenance -> 1 Vehicule
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "vehicule_id")
+    private Vehicule vehicule;
 }

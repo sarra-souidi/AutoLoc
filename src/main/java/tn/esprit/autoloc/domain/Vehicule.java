@@ -1,12 +1,13 @@
 package tn.esprit.autoloc.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "vehicule")
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Vehicule {
 
     @Id
@@ -39,4 +41,27 @@ public class Vehicule {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private StatutVehicule statut;
+
+    // N Vehicule -> 1 Agence
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agence_id")
+    private Agence agence;
+
+    // N Vehicule <-> N Equipement (table de jointure)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "vehicule_equipement",
+            joinColumns = @JoinColumn(name = "vehicule_id"),
+            inverseJoinColumns = @JoinColumn(name = "equipement_id"))
+    @Builder.Default
+    private Set<Equipement> equipements = new HashSet<>();
+
+    // 1 Vehicule -> N Reservation
+    @OneToMany(mappedBy = "vehicule", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Reservation> reservations = new ArrayList<>();
+
+    // 1 Vehicule -> N Maintenance
+    @OneToMany(mappedBy = "vehicule", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Maintenance> maintenances = new ArrayList<>();
 }
